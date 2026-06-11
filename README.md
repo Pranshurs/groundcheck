@@ -1,5 +1,9 @@
 # GroundCheck
 
+[![CI](https://github.com/Pranshurs/groundcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranshurs/groundcheck/actions)
+[![PyPI](https://img.shields.io/pypi/v/groundcheck-rag)](https://pypi.org/project/groundcheck-rag/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Grounding verification for RAG outputs. Given a source text and an answer, GroundCheck
 predicts whether the answer is actually supported by the source, with a confidence score.
 It catches the common failure modes of RAG systems: contradicted facts, swapped numbers,
