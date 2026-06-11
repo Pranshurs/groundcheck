@@ -30,7 +30,7 @@ Trained on RAGTruth, VitaminC, and programmatically generated hard negatives. We
 ## Install
 
 ```bash
-pip install groundcheck
+pip install groundcheck-rag
 ```
 
 Without PyTorch installed, the library falls back to a lexical-overlap heuristic. Install

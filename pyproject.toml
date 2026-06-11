@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "groundcheck"
+name = "groundcheck-rag"
 version = "0.1.0"
 description = "A small, cheap hallucination / grounding detector — does an AI answer stay supported by its source?"
 readme = "README.md"
