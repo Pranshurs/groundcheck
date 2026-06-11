@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "groundcheck"
+version = "0.1.0"
+description = "A small, cheap hallucination / grounding detector — does an AI answer stay supported by its source?"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Pranshu Raj", email = "pranshu.rs08@gmail.com" }]
+keywords = ["llm", "hallucination", "grounding", "rag", "evaluation", "nli", "faithfulness"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core install is light: the lexical-overlap fallback works with no heavy deps.
+dependencies = []
+
+[project.optional-dependencies]
+# Real model inference (the fine-tuned encoder).
+model = ["torch>=2.2.0", "transformers>=4.48.0"]
+# Serving the HTTP API.
+serve = ["fastapi>=0.110.0", "uvicorn[standard]>=0.29.0", "pydantic>=2.6.0"]
+# The LLM-judge baseline used by the benchmark.
+judge = ["openai>=1.30.0"]
+
+[project.urls]
+Homepage = "https://github.com/Pranshurs/groundcheck"
+Repository = "https://github.com/Pranshurs/groundcheck"
+
+[project.scripts]
+groundcheck = "groundcheck.cli:main"
+
+[tool.setuptools]
+packages = ["groundcheck"]
