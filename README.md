@@ -94,6 +94,12 @@ intervals, latency, and cost per 1k checks.
 - Research and non-commercial use. The training data (RAGTruth, VitaminC) carries
   research-oriented terms from its underlying sources.
 
+## Hosted version
+
+A commercially-licensed version of this model (sentence-level verdicts, batch log
+auditing, hosted API) is in pilot. Details: docs/how-it-was-built.md, or email
+pranshu.rs08@gmail.com.
+
 ## License
 
 MIT. Base model: answerdotai/ModernBERT-base (Apache-2.0).
