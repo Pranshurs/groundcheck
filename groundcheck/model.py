@@ -61,6 +61,32 @@ class InputTooLongError(ValueError):
 EXPECTED_LABELS = {0: "grounded", 1: "hallucinated"}
 
 
+def _resolved_hub_commit(path: str, revision: Optional[str], config) -> Optional[str]:
+    """The Hub commit the weights were loaded from, or None for a local directory.
+
+    transformers 4.x records it as ``config._commit_hash``; 5.x dropped that attribute, so
+    fall back to the snapshot directory the Hub cache resolved ``config.json`` into
+    (``.../snapshots/<commit>/config.json``), which works online and offline.
+    """
+    import os
+
+    if os.path.isdir(path):
+        return None
+    commit = getattr(config, "_commit_hash", None)
+    if commit:
+        return commit
+    from huggingface_hub import hf_hub_download
+
+    try:
+        cached = hf_hub_download(path, "config.json", revision=revision)
+    except Exception:  # pragma: no cover - the model itself loaded, so this is not expected
+        return None
+    parts = os.path.normpath(cached).split(os.sep)
+    if len(parts) >= 3 and parts[-3] == "snapshots":
+        return parts[-2]
+    return None
+
+
 class GroundCheck:
     """Load once, call ``check`` (or ``check_many``) many times.
 
@@ -122,7 +148,7 @@ class GroundCheck:
         self._tokenizer = AutoTokenizer.from_pretrained(path, revision=revision)
         self._model = AutoModelForSequenceClassification.from_pretrained(path, revision=revision)
         self._model.eval()
-        self._resolved_revision = getattr(self._model.config, "_commit_hash", None)
+        self._resolved_revision = _resolved_hub_commit(path, revision, self._model.config)
 
         # The label order is part of the model contract: refuse anything else rather than
         # guess, so a model with flipped labels can never silently invert every verdict.

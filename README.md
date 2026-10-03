@@ -82,6 +82,10 @@ r = gc.check(
 print(r.label, r.grounded_score, r.backend)  # hallucinated <score> model
 ```
 
+Verified with torch 2.4.1 + transformers 4.49.0 (the pinned CI and reproduction stack) and
+with torch 2.14.1 + transformers 5.18.0 (an unpinned install, October 2026), where the gate
+slice gave identical predictions and scores.
+
 If torch/transformers aren't installed or the weights can't be loaded, `GroundCheck()`
 raises `ModelUnavailableError`. It never silently falls back. A dependency-free
 lexical-overlap baseline is available, but only if you ask for it:
