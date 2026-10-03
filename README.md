@@ -131,7 +131,8 @@ pip install -r requirements-train.txt -r requirements-dev.txt && pip install -e 
 python -m eval.provenance --verify          # weights match MODEL_PROVENANCE.json and the Hub's LFS hash
 python -m training.build_data --verify      # rebuild the public data; checksums must match the manifest
 pytest -m model                             # real-model tests
-python -m eval.reproduce                    # full evaluation (~15 min on an M1 CPU)
+python -m eval.reproduce                    # full evaluation at the 512-token published protocol (~15 min on an M1 CPU)
+python -m eval.reproduce --max-length 2048  # the package default
 python -m training.train                    # retrain (GPU strongly recommended; gives a sibling model, see training/README.md)
 ```
 

@@ -9,7 +9,7 @@
 > The corrected sentences are below; measured evidence is in the README.
 
 I built GroundCheck, a small open model that checks whether an AI answer is actually
-supported by the source it cites. It scores 0.682 F1 on the RAGTruth benchmark, where the RAGTruth paper reports 0.634 for a
+supported by the source it cites. It scores 0.682 F1 on the RAGTruth benchmark (first 2,500 of the 2,700 test responses), where the RAGTruth paper reports 0.634 for a
 GPT-4-turbo prompt judge. That's a different protocol, not a head-to-head run. On a
 laptop CPU (Apple M1) it returns a verdict in about 40 ms for short claims and about 350 ms
 for a typical RAG document; documents over 2,048 tokens take about 1.5 s. Total compute cost: zero — every training run fit inside Kaggle's
@@ -32,7 +32,8 @@ Hypothesis: the answer. Output: grounded or hallucinated, with a probability.
 ## v1: good benchmark, bad model
 
 The first version was ModernBERT-base fine-tuned on RAGTruth, the standard benchmark for
-this task: 0.688 F1, above the published GPT-4 judge figure. Shipped it, felt great.
+this task: 0.688 F1, numerically above the published GPT-4 judge figure (a different protocol,
+not a head-to-head run). Shipped it, felt great.
 
 Then I ran five quick manual cases — short, realistic inputs like a source saying revenue
 "increased 12%" and an answer claiming it "fell 12%", or a vaccine's "94% effective"
