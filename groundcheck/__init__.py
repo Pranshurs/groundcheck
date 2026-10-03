@@ -1,27 +1,26 @@
-"""GroundCheck — a small, cheap hallucination / grounding detector.
+"""GroundCheck — a small grounding / hallucination detector for RAG answers.
 
 Typical use::
 
     from groundcheck import GroundCheck
 
-    gc = GroundCheck()                       # loads the model, or the heuristic fallback
+    gc = GroundCheck()                       # loads the pinned published model, or raises
     r = gc.check(source="The capital of France is Paris.",
                  answer="Paris is the capital of France.")
-    print(r.label, r.grounded_score)         # -> grounded 0.97
+    print(r.label, r.grounded_score, r.backend)
 
-Point it at a fine-tuned model with the GROUNDCHECK_MODEL_PATH env var (a local dir or a
-Hugging Face id). With nothing trained yet, it transparently uses a lexical-overlap
-baseline and says so via ``r.backend``.
+``GroundCheck(backend="heuristic")`` gives the dependency-free lexical-overlap baseline;
+it is never used unless asked for.
 """
 
 from __future__ import annotations
 
 from typing import Optional
 
-from .model import GroundCheck
+from .model import GroundCheck, ModelUnavailableError
 from .schemas import CheckResult
 
-__all__ = ["GroundCheck", "CheckResult", "check", "__version__"]
+__all__ = ["GroundCheck", "CheckResult", "ModelUnavailableError", "check", "__version__"]
 __version__ = "0.2.0"
 
 _DEFAULT: Optional[GroundCheck] = None

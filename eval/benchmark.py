@@ -12,7 +12,7 @@ under eval/results/.
 
 Run offline (mock judge, heuristic detector — proves the harness works with zero setup):
 
-    python -m eval.benchmark --data eval/cases/sample_grounding.jsonl
+    python -m eval.benchmark --backend heuristic --data eval/cases/sample_grounding.jsonl
 
 Real numbers (set a trained model + a live judge key in .env):
 
@@ -52,10 +52,10 @@ def _y_true(rows: list[dict]) -> list[int]:
     return [1 if str(r["label"]).lower().startswith("halluc") else 0 for r in rows]
 
 
-def run_detector(rows: list[dict], threshold: float) -> dict:
+def run_detector(rows: list[dict], threshold: float, backend: str | None = None) -> dict:
     settings = get_detector_settings()
     settings.threshold = threshold
-    gc = GroundCheck(settings)
+    gc = GroundCheck(settings, backend=backend) if backend else GroundCheck(settings)
     items = [{"source": r["source"], "answer": r["answer"], "question": r.get("question")} for r in rows]
     t0 = time.perf_counter()
     results = gc.check_many(items)
@@ -154,6 +154,8 @@ def main() -> None:
     parser.add_argument("--data", default="eval/cases/sample_grounding.jsonl", help="JSONL test set.")
     parser.add_argument("--limit", type=int, default=None, help="Cap the number of examples.")
     parser.add_argument("--threshold", type=float, default=0.5, help="grounded_score decision threshold.")
+    parser.add_argument("--backend", choices=("model", "heuristic"), default=None,
+                        help="Detector backend (default: GROUNDCHECK_BACKEND, i.e. model).")
     parser.add_argument("--no-judge", action="store_true", help="Skip the LLM judge baseline.")
     parser.add_argument("--vps-usd-per-hr", type=float, default=0.011, help="Self-host price (≈$8/mo).")
     parser.add_argument("--out", default="eval/results", help="Directory for the JSON result.")
@@ -164,7 +166,7 @@ def main() -> None:
     print(f"Loaded {len(rows)} examples from {args.data} "
           f"({sum(y_true)} hallucinated / {len(y_true) - sum(y_true)} grounded)\n")
 
-    detector = run_detector(rows, args.threshold)
+    detector = run_detector(rows, args.threshold, args.backend)
     judge = None if args.no_judge else run_judge(rows)
     table = build_rows(y_true, detector, judge, args.vps_usd_per_hr)
 
@@ -173,8 +175,8 @@ def main() -> None:
     if judge and judge.get("mode") == "mock":
         print("NOTE: judge ran in MOCK mode — set LLM_API_KEY for real judge numbers.\n")
     if detector["backend"] == "heuristic":
-        print("NOTE: detector ran on the HEURISTIC fallback — set GROUNDCHECK_MODEL_PATH "
-              "to benchmark the trained model.\n")
+        print("NOTE: detector ran on the HEURISTIC baseline (requested explicitly); drop "
+              "--backend heuristic to benchmark the trained model.\n")
 
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)

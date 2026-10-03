@@ -1,26 +1,26 @@
 """The grounding detector.
 
 ``GroundCheck`` answers: *given the source/context an AI was supposed to use, is its
-answer supported (grounded) or unsupported (hallucinated)?* It returns a calibrated
+answer supported (grounded) or unsupported (hallucinated)?* It returns a
 ``grounded_score`` and a label.
 
-Two backends behind one interface:
+Two backends behind one interface, always chosen explicitly:
 
-* **model**     — the fine-tuned ModernBERT classifier (the real product). Loaded lazily
-  so importing this package costs nothing until you actually run a check.
-* **heuristic** — a dependency-free lexical-overlap baseline. Used automatically when no
-  trained model is available, so the API, web demo, tests and CI run with zero setup and
-  zero heavy dependencies. It is also reported as the "naive baseline" row in the
-  benchmark — a trained model that can't beat token-overlap isn't worth shipping.
+* **model**     — the fine-tuned ModernBERT classifier, pinned to an exact Hugging Face
+  revision. The default. If it cannot be loaded, construction raises
+  :class:`ModelUnavailableError`; nothing is substituted.
+* **heuristic** — a dependency-free lexical-overlap baseline. Only used when requested
+  (``backend="heuristic"`` / ``GROUNDCHECK_BACKEND=heuristic``). Useful for tests and as
+  the naive baseline row in the benchmark.
 
-The backend that actually answered is recorded on every ``CheckResult`` so nothing is
-ever silently faked.
+Every ``CheckResult`` records which backend produced it.
 """
 
 from __future__ import annotations
 
 import re
 import time
+from dataclasses import replace
 from typing import Optional
 
 from .config import DetectorSettings, get_detector_settings
@@ -46,6 +46,13 @@ def _content_tokens(text: str) -> list[str]:
     return [w for w in _WORD_RE.findall(text.lower()) if w not in _STOPWORDS and len(w) > 1]
 
 
+class ModelUnavailableError(RuntimeError):
+    """The model backend was requested (the default) but the model could not be loaded."""
+
+
+EXPECTED_LABELS = {0: "grounded", 1: "hallucinated"}
+
+
 class GroundCheck:
     """Load once, call ``check`` (or ``check_many``) many times.
 
@@ -53,49 +60,65 @@ class GroundCheck:
     ----------
     settings:
         Optional :class:`DetectorSettings`; defaults to environment-driven settings.
+    **overrides:
+        Any ``DetectorSettings`` field, e.g. ``GroundCheck(backend="heuristic")``.
     """
 
-    def __init__(self, settings: Optional[DetectorSettings] = None) -> None:
-        self.settings = settings or get_detector_settings()
+    def __init__(self, settings: Optional[DetectorSettings] = None, **overrides) -> None:
+        base = settings or get_detector_settings()
+        self.settings = replace(base, **overrides) if overrides else base
         self._tokenizer = None
         self._model = None
         self._torch = None
+        self._device = "cpu"
         self._grounded_index = 0
+        self._resolved_revision: Optional[str] = None
         self.backend = self._init_backend()
 
     # ------------------------------------------------------------------ #
     # backend selection / loading                                        #
     # ------------------------------------------------------------------ #
     def _init_backend(self) -> str:
-        want = self.settings.backend
-        if want == "heuristic":
+        if self.settings.backend == "heuristic":
             return "heuristic"
-        if want in {"auto", "model"}:
-            if not self.settings.model_path and want == "auto":
-                # Nothing trained yet — fall back silently (this is the expected pre-train state).
-                return "heuristic"
-            try:
-                self._load_model()
-                return "model"
-            except Exception as exc:  # pragma: no cover - depends on optional heavy deps
-                if want == "model":
-                    raise RuntimeError(
-                        f"GROUNDCHECK_BACKEND=model but the model could not be loaded "
-                        f"({exc}). Train one (see train/) or set the backend to 'auto'."
-                    ) from exc
-                return "heuristic"
-        raise ValueError(f"Unknown backend: {want!r}")
+        try:
+            self._load_model()
+        except ModelUnavailableError:
+            raise
+        except ImportError as exc:
+            raise ModelUnavailableError(
+                f"The model backend needs torch and transformers ({exc}). Install them with "
+                f"`pip install \"groundcheck-rag[model]\"`, or pass backend='heuristic' to use "
+                f"the lexical-overlap baseline knowingly."
+            ) from exc
+        except Exception as exc:
+            raise ModelUnavailableError(
+                f"Could not load model {self.settings.model_path!r} "
+                f"(revision {self.settings.revision or 'unpinned'}): {exc}"
+            ) from exc
+        return "model"
 
     def _load_model(self) -> None:
-        """Lazily import torch/transformers and load the fine-tuned classifier."""
+        """Import torch/transformers lazily and load the pinned classifier."""
         import torch  # noqa: WPS433 (lazy import is intentional)
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
         self._torch = torch
         path = self.settings.model_path
-        self._tokenizer = AutoTokenizer.from_pretrained(path)
-        self._model = AutoModelForSequenceClassification.from_pretrained(path)
+        revision = self.settings.revision
+        self._tokenizer = AutoTokenizer.from_pretrained(path, revision=revision)
+        self._model = AutoModelForSequenceClassification.from_pretrained(path, revision=revision)
         self._model.eval()
+        self._resolved_revision = getattr(self._model.config, "_commit_hash", None)
+
+        # The label order is part of the model contract: refuse anything else rather than
+        # guess, so a model with flipped labels can never silently invert every verdict.
+        id2label = {int(k): str(v).lower() for k, v in self._model.config.id2label.items()}
+        if id2label != EXPECTED_LABELS:
+            raise ModelUnavailableError(
+                f"Model {path!r} has labels {id2label}; GroundCheck expects {EXPECTED_LABELS}"
+            )
+        self._grounded_index = 0
 
         device = self.settings.device
         if device == "auto":
@@ -103,20 +126,22 @@ class GroundCheck:
         self._model.to(device)
         self._device = device
 
-        # Find which output index means "grounded/supported" from the model config,
-        # so the train-time label order can never silently flip the score.
-        id2label = {int(k): str(v).lower() for k, v in self._model.config.id2label.items()}
-        self._grounded_index = next(
-            (i for i, lbl in id2label.items() if lbl.startswith("ground") or "support" in lbl),
-            0,
-        )
-
     # ------------------------------------------------------------------ #
     # public API                                                         #
     # ------------------------------------------------------------------ #
     def model_info(self) -> dict:
-        """What is answering: backend plus the model reference it was loaded from."""
-        return {"backend": self.backend, "path": self.settings.model_path or None}
+        """What is answering, and exactly which weights (for logs and provenance)."""
+        if self.backend == "heuristic":
+            return {"backend": "heuristic"}
+        return {
+            "backend": "model",
+            "path": self.settings.model_path,
+            "requested_revision": self.settings.revision,
+            "resolved_revision": self._resolved_revision,
+            "architecture": type(self._model).__name__,
+            "max_length": self.settings.max_length,
+            "device": self._device,
+        }
 
     def check(self, source: str, answer: str, question: Optional[str] = None) -> CheckResult:
         """Check a single answer against its source. ``question`` is optional context."""
