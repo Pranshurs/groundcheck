@@ -1,0 +1,122 @@
+{
+  "repo_id": "Pranshurs/groundcheck-modernbert",
+  "revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+  "weights_commit": "0c7dd0636c0d58b5e3865db8f1deee5a5acfeb6c",
+  "note": "998cec35 changed only README.md; every file below is identical at 0c7dd063.",
+  "architecture": [
+    "ModernBertForSequenceClassification"
+  ],
+  "id2label": {
+    "0": "grounded",
+    "1": "hallucinated"
+  },
+  "base_model": "answerdotai/ModernBERT-base",
+  "trained_with_transformers": "4.49.0",
+  "files": {
+    "config.json": {
+      "sha256": "80a933d5bc32aae4ec60a10a97e301dfd201970f6fd829bd57fdab664691b703",
+      "bytes": 1491
+    },
+    "model.safetensors": {
+      "sha256": "9ec331ba6d8a9d93236dd72b239df518b07e61241323876f8aafc223d959461a",
+      "bytes": 598439784
+    },
+    "tokenizer.json": {
+      "sha256": "27f9e6ed6abdda3c0873addc5faf6a0a9fd16c2b12b71f12e4fe056ad2128328",
+      "bytes": 3583323
+    },
+    "tokenizer_config.json": {
+      "sha256": "c16f1b07f93d05be753ec0acf8cb511d895a8bdb09669f6b156df81e3f96c2eb",
+      "bytes": 20836
+    },
+    "special_tokens_map.json": {
+      "sha256": "ea97ecdbcc73713039d8d64dbb05e3689495c96657fbd9a18f5bed381be81049",
+      "bytes": 694
+    },
+    "training_args.bin": {
+      "sha256": "11ad97336bca62be1f87ecdbb03063f50de6df8f997f298a936181db75dd1d89",
+      "bytes": 5304
+    },
+    "metrics.json": {
+      "sha256": "de6d0f48229a05a28fa58e2a404547d9d8e24b049e478d18eb3af49843c1ac8c",
+      "bytes": 1723
+    }
+  },
+  "training_args": {
+    "num_train_epochs": "3",
+    "per_device_train_batch_size": "16",
+    "learning_rate": "2e-05",
+    "weight_decay": "0.01",
+    "warmup_ratio": "0.06",
+    "lr_scheduler_type": "SchedulerType.LINEAR",
+    "seed": "42",
+    "fp16": "True",
+    "gradient_checkpointing": "True",
+    "group_by_length": "True",
+    "optim": "OptimizerNames.ADAMW_TORCH",
+    "max_grad_norm": "1.0"
+  },
+  "published_metrics": {
+    "ragtruth": {
+      "accuracy": 0.7468,
+      "f1": 0.6823883592574008,
+      "n": 2500,
+      "f1_ci95": [
+        0.6574761399787911,
+        0.7058823529411765
+      ]
+    },
+    "vitaminc": {
+      "accuracy": 0.8495,
+      "f1": 0.8446050593701601,
+      "n": 2000
+    },
+    "flipped_neg": {
+      "accuracy": 0.804,
+      "f1": 0.8913525498891353,
+      "n": 500
+    },
+    "flipped_pos": {
+      "accuracy": 0.762,
+      "f1": 0,
+      "n": 500
+    },
+    "manual5": [
+      {
+        "answer": "Most of the Amazon rainforest, around 60%, lies within Brazi",
+        "expected": "grounded",
+        "got": "grounded",
+        "p_hall": 0.004,
+        "pass": true
+      },
+      {
+        "answer": "The Amazon rainforest produces 20% of the world's oxygen and",
+        "expected": "hallucinated",
+        "got": "hallucinated",
+        "p_hall": 0.596,
+        "pass": true
+      },
+      {
+        "answer": "Revenue grew 12% in the third quarter, reaching $2.1 billion",
+        "expected": "grounded",
+        "got": "grounded",
+        "p_hall": 0.001,
+        "pass": true
+      },
+      {
+        "answer": "The company's revenue fell 12% in Q3.",
+        "expected": "hallucinated",
+        "got": "hallucinated",
+        "p_hall": 0.989,
+        "pass": true
+      },
+      {
+        "answer": "The vaccine showed 49% effectiveness in preventing symptomat",
+        "expected": "hallucinated",
+        "got": "hallucinated",
+        "p_hall": 0.989,
+        "pass": true
+      }
+    ]
+  }
+}
