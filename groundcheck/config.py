@@ -51,7 +51,7 @@ class DetectorSettings:
     threshold: float = 0.5               # grounded if grounded_score >= threshold
     max_length: int = DEFAULT_MAX_LENGTH  # token cap for (question + source, answer)
     device: str = "auto"                 # "auto" | "cpu" | "cuda"
-    revision: Optional[str] = DEFAULT_MODEL_REVISION  # HF commit; ignored for local dirs
+    revision: Optional[str] = None       # HF commit; None => pinned for the published model only
 
     def __post_init__(self) -> None:
         self.backend = (self.backend or "").strip().lower()
@@ -65,6 +65,10 @@ class DetectorSettings:
             raise ValueError(f"Unknown backend {self.backend!r}; expected one of {BACKENDS}")
         if self.backend == "model" and not self.model_path:
             raise ValueError("backend='model' needs a model_path (HF id or local directory)")
+        if self.revision is None and self.model_path == DEFAULT_MODEL_ID:
+            # The pinned revision belongs to the published model only; any other path
+            # resolves to whatever it contains unless a revision is given.
+            self.revision = DEFAULT_MODEL_REVISION
 
 
 @dataclass
@@ -81,11 +85,7 @@ class JudgeSettings:
 
 def get_detector_settings() -> DetectorSettings:
     model_path = os.getenv("GROUNDCHECK_MODEL_PATH", "").strip() or DEFAULT_MODEL_ID
-    revision = os.getenv("GROUNDCHECK_MODEL_REVISION", "").strip()
-    if not revision:
-        # The pinned revision only applies to the published model; a custom model path
-        # resolves to whatever that path contains unless a revision is given.
-        revision = DEFAULT_MODEL_REVISION if model_path == DEFAULT_MODEL_ID else None
+    revision = os.getenv("GROUNDCHECK_MODEL_REVISION", "").strip() or None
     return DetectorSettings(
         model_path=model_path,
         backend=os.getenv("GROUNDCHECK_BACKEND", "model"),
