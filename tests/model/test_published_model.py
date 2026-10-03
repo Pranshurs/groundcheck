@@ -18,7 +18,7 @@ transformers = pytest.importorskip("transformers")
 from fastapi.testclient import TestClient  # noqa: E402
 
 from groundcheck import GroundCheck, InputTooLongError, ModelUnavailableError, api  # noqa: E402
-from groundcheck.config import DEFAULT_MODEL_REVISION  # noqa: E402
+from groundcheck.config import DEFAULT_MAX_LENGTH, DEFAULT_MODEL_REVISION  # noqa: E402
 from training.data import MANUAL_CASES  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,7 +35,7 @@ def test_loads_the_pinned_revision(gc):
     assert gc.backend == "model"
     assert info["resolved_revision"] == DEFAULT_MODEL_REVISION
     assert info["architecture"] == "ModernBertForSequenceClassification"
-    assert info["max_length"] == 512
+    assert info["max_length"] == DEFAULT_MAX_LENGTH
 
 
 @pytest.mark.parametrize("i", range(len(MANUAL_CASES)))
@@ -70,14 +70,14 @@ def test_long_source_is_truncated_not_the_answer(gc):
 
 def test_answer_longer_than_budget_is_rejected(gc):
     with pytest.raises(InputTooLongError, match="Split it"):
-        gc.check("short source", "word " * 600)
+        gc.check("short source", "word " * 2500)
 
 
 def test_api_returns_422_for_overlong_answer(monkeypatch):
     monkeypatch.setenv("GROUNDCHECK_BACKEND", "model")
     with TestClient(api.app) as client:
         assert client.get("/api/health").json()["model"]["resolved_revision"] == DEFAULT_MODEL_REVISION
-        r = client.post("/api/check", json={"source": "short", "answer": "word " * 600})
+        r = client.post("/api/check", json={"source": "short", "answer": "word " * 2500})
         assert r.status_code == 422 and "tokens" in r.json()["detail"]
 
 

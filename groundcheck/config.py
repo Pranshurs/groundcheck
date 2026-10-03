@@ -36,13 +36,20 @@ DEFAULT_MODEL_REVISION = "998cec35563d6b90947409d1c7510adac7f7c80c"
 
 BACKENDS = ("model", "heuristic")
 
+# Token budget for (question + source, answer). The model was fine-tuned and its published
+# numbers measured at 512; at 2048 it scored higher on the same RAGTruth rows (F1 0.6955 vs
+# 0.6817, paired bootstrap ΔF1 95% CI [-0.001, +0.028]) at ~2.5x the CPU time, and 2048 is
+# what 0.1.0 used, so it stays the default. See eval/reports/ and the README.
+DEFAULT_MAX_LENGTH = 2048
+PUBLISHED_PROTOCOL_MAX_LENGTH = 512
+
 
 @dataclass
 class DetectorSettings:
     model_path: str = DEFAULT_MODEL_ID   # local dir or HF id of the fine-tuned classifier
     backend: str = "model"               # "model" | "heuristic" — never chosen implicitly
     threshold: float = 0.5               # grounded if grounded_score >= threshold
-    max_length: int = 512                # token cap for (question + source, answer); see README
+    max_length: int = DEFAULT_MAX_LENGTH  # token cap for (question + source, answer)
     device: str = "auto"                 # "auto" | "cpu" | "cuda"
     revision: Optional[str] = DEFAULT_MODEL_REVISION  # HF commit; ignored for local dirs
 
@@ -83,7 +90,7 @@ def get_detector_settings() -> DetectorSettings:
         model_path=model_path,
         backend=os.getenv("GROUNDCHECK_BACKEND", "model"),
         threshold=float(os.getenv("GROUNDCHECK_THRESHOLD", "0.5")),
-        max_length=int(os.getenv("GROUNDCHECK_MAX_LENGTH", "512")),
+        max_length=int(os.getenv("GROUNDCHECK_MAX_LENGTH", str(DEFAULT_MAX_LENGTH))),
         device=os.getenv("GROUNDCHECK_DEVICE", "auto").strip().lower(),
         revision=revision,
     )

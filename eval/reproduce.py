@@ -21,7 +21,7 @@ import sys
 import time
 from pathlib import Path
 
-from groundcheck.config import DEFAULT_MODEL_ID, DEFAULT_MODEL_REVISION
+from groundcheck.config import DEFAULT_MODEL_ID, DEFAULT_MODEL_REVISION, PUBLISHED_PROTOCOL_MAX_LENGTH
 from groundcheck.model import GroundCheck
 
 from . import metrics
@@ -118,7 +118,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--model-path", default=DEFAULT_MODEL_ID)
     ap.add_argument("--revision", default=None, help="default: pinned revision for the published model")
-    ap.add_argument("--max-length", type=int, default=512)
+    ap.add_argument("--max-length", type=int, default=PUBLISHED_PROTOCOL_MAX_LENGTH,
+                    help="default 512, the published protocol (the package default is 2048)")
     ap.add_argument("--threshold", type=float, default=0.5)
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--suites", nargs="+", default=list(SUITES) + ["manual"],
