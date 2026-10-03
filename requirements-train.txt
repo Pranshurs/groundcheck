@@ -1,0 +1,9 @@
+# Exact versions for data building, training and the reproduction/eval tier.
+# The published weights were trained with torch 2.4.1 (cu121) + transformers 4.49.0 on a
+# Kaggle P100; inference/eval in this repo was re-run with the same two pins on CPU.
+# For CUDA, install torch from https://download.pytorch.org/whl/cu121 instead.
+torch==2.4.1
+transformers==4.49.0
+datasets==3.2.0
+accelerate==1.2.1
+numpy>=1.26

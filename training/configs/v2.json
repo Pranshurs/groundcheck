@@ -1,0 +1,43 @@
+{
+  "name": "groundcheck-v2",
+  "published_model": {
+    "repo_id": "Pranshurs/groundcheck-modernbert",
+    "weights_revision": "0c7dd0636c0d58b5e3865db8f1deee5a5acfeb6c",
+    "card_revision": "998cec35563d6b90947409d1c7510adac7f7c80c"
+  },
+  "base_model": {
+    "repo_id": "answerdotai/ModernBERT-base",
+    "revision": "8949b909ec900327062f0ebf497f51aef5e6f0c8"
+  },
+  "datasets": {
+    "ragtruth": {"repo_id": "wandb/RAGTruth-processed", "revision": "eb4f4b9d1b68eb7092d3e1a61c0cd82d9808737b"},
+    "vitaminc": {"repo_id": "tals/vitaminc", "revision": "be6febb761b0b2807687e61e0b5282e459df2fa0"}
+  },
+  "data": {
+    "seed": 0,
+    "ragtruth_train": 10000,
+    "ragtruth_val": 1000,
+    "ragtruth_test": 2500,
+    "vitaminc_train": {"SUPPORTS": 10000, "REFUTES": 4000, "NOT ENOUGH INFO": 2000},
+    "vitaminc_val": 1000,
+    "vitaminc_test": 2000,
+    "hard_neg_train": 2500,
+    "hard_neg_test": 500,
+    "question_drop": 0.5
+  },
+  "train": {
+    "seed": 42,
+    "max_length": 512,
+    "epochs": 3,
+    "train_batch_size": 16,
+    "eval_batch_size": 16,
+    "learning_rate": 2e-5,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.06,
+    "lr_scheduler": "linear",
+    "gradient_checkpointing": true,
+    "fp16_on_cuda": true,
+    "group_by_length": true,
+    "attn_implementation": "eager"
+  }
+}
