@@ -18,8 +18,9 @@ Checks, and why each threshold is what it is:
    leaves ~50x headroom for numeric noise while any change to tokenisation, truncation,
    label mapping or weights moves far more rows.
 3. Metric floors per suite: F1 and accuracy may drop at most 0.03 below the reference on
-   the same rows. On a 200-row slice the bootstrap CI of F1 is wide (about ±0.06), so this
-   catches broad regressions, not subtle ones; check 2 covers those.
+   the same rows. On the 200-row RAGTruth slice the bootstrap 95% CI of F1 is 0.56-0.74, so
+   this catches broad regressions, not subtle ones; check 2 covers those (see mutant C in
+   eval/reports/gate-mutants/README.md).
 4. Per-class recall may drop at most 0.05 for either class. A model collapsing toward one
    label can keep accuracy plausible on an imbalanced slice; per-class recall can't hide it.
 """

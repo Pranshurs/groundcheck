@@ -1,0 +1,18 @@
+PASS  provenance: revision                   998cec35563d6b90947409d1c7510adac7f7c80c vs 998cec35563d6b90947409d1c7510adac7f7c80c
+PASS  provenance: weights sha256             9ec331ba6d8a9d93
+PASS  provenance: data hashes                678cf1565b5e85bd
+PASS  protocol: max_length                   512 vs 512
+PASS  ragtruth: prediction agreement         1.0000 (min 0.98)
+PASS  ragtruth: mean |Δ score|               0.00000 (max 0.01)
+PASS  ragtruth: f1                           0.6575 vs ref 0.6575
+PASS  ragtruth: accuracy                     0.7500 vs ref 0.7500
+PASS  ragtruth: recall_hallucinated          0.6575 vs ref 0.6575
+PASS  ragtruth: recall_grounded              0.8031 vs ref 0.8031
+PASS  vitaminc: prediction agreement         1.0000 (min 0.98)
+PASS  vitaminc: mean |Δ score|               0.00000 (max 0.01)
+PASS  vitaminc: f1                           0.8846 vs ref 0.8846
+PASS  vitaminc: accuracy                     0.8800 vs ref 0.8800
+PASS  vitaminc: recall_hallucinated          0.9020 vs ref 0.9020
+PASS  vitaminc: recall_grounded              0.8571 vs ref 0.8571
+
+gate: PASSED
