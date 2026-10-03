@@ -23,7 +23,7 @@ import time
 from dataclasses import replace
 from typing import Optional
 
-from .config import DetectorSettings, get_detector_settings
+from .config import DEFAULT_MODEL_ID, DEFAULT_MODEL_REVISION, DetectorSettings, get_detector_settings
 from .schemas import CheckResult
 
 # Small, fixed stop-word list for the heuristic backend (kept inline so the fallback has
@@ -74,6 +74,11 @@ class GroundCheck:
 
     def __init__(self, settings: Optional[DetectorSettings] = None, **overrides) -> None:
         base = settings or get_detector_settings()
+        if "model_path" in overrides and "revision" not in overrides:
+            # The pinned revision belongs to the published model only; a different model
+            # path must not inherit it (it would name a commit that path doesn't have).
+            overrides["revision"] = (DEFAULT_MODEL_REVISION
+                                     if overrides["model_path"] == DEFAULT_MODEL_ID else None)
         self.settings = replace(base, **overrides) if overrides else base
         self._tokenizer = None
         self._model = None

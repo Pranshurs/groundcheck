@@ -43,6 +43,12 @@ def test_custom_model_path_is_not_given_the_published_revision(clean_env, monkey
     assert get_detector_settings().revision is None
 
 
+def test_overriding_model_path_drops_the_published_revision(clean_env):
+    assert GroundCheck(model_path="./my-model", backend="heuristic").settings.revision is None
+    assert GroundCheck(model_path="./my-model", revision="abc", backend="heuristic").settings.revision == "abc"
+    assert GroundCheck(model_path=DEFAULT_MODEL_ID, backend="heuristic").settings.revision == DEFAULT_MODEL_REVISION
+
+
 def test_auto_backend_is_rejected():
     with pytest.raises(ValueError, match="removed in 0.2.0"):
         DetectorSettings(backend="auto")
