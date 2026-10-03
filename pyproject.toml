@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "groundcheck-rag"
-version = "0.1.0"
+version = "0.2.0"
 description = "A small, cheap hallucination / grounding detector — does an AI answer stay supported by its source?"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -37,3 +37,6 @@ groundcheck = "groundcheck.cli:main"
 
 [tool.setuptools]
 packages = ["groundcheck"]
+
+[tool.setuptools.package-data]
+groundcheck = ["templates/*.html"]

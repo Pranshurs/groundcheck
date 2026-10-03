@@ -66,7 +66,7 @@ in-process library:
 
 ```bash
 uvicorn groundcheck.api:app --port 8000
-# POST /check  {"source": "...", "answer": "..."}
+# POST /api/check  {"source": "...", "answer": "..."}
 ```
 
 A single-page demo UI is served at the API root.

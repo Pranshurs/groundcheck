@@ -114,6 +114,10 @@ class GroundCheck:
     # ------------------------------------------------------------------ #
     # public API                                                         #
     # ------------------------------------------------------------------ #
+    def model_info(self) -> dict:
+        """What is answering: backend plus the model reference it was loaded from."""
+        return {"backend": self.backend, "path": self.settings.model_path or None}
+
     def check(self, source: str, answer: str, question: Optional[str] = None) -> CheckResult:
         """Check a single answer against its source. ``question`` is optional context."""
         t0 = time.perf_counter()

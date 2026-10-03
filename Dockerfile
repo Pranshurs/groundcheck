@@ -2,16 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install dependencies first for better layer caching.
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# CPU-only torch keeps the image small; the model runs fine on CPU.
+COPY pyproject.toml README.md ./
+COPY groundcheck ./groundcheck
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu ".[serve,model]"
 
-# Copy the app (including ./artifacts if a trained model has been placed there).
-COPY . .
-
-# The detector loads from GROUNDCHECK_MODEL_PATH if set; otherwise it runs on the
-# heuristic fallback so the container always starts.
-ENV GROUNDCHECK_BACKEND=auto
 EXPOSE 8000
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "groundcheck.api:app", "--host", "0.0.0.0", "--port", "8000"]
