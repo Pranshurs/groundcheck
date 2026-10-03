@@ -40,3 +40,10 @@ packages = ["groundcheck"]
 
 [tool.setuptools.package-data]
 groundcheck = ["templates/*.html"]
+
+[tool.pytest.ini_options]
+# Unit tier by default (no weights). `pytest -m model` runs the real-model tier.
+addopts = "-m 'not model'"
+markers = [
+  "model: loads the pinned published weights (~600 MB download on first run)",
+]

@@ -19,13 +19,13 @@ from contextlib import asynccontextmanager
 from importlib import resources
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from . import __version__
 from .config import get_detector_settings
-from .model import GroundCheck
+from .model import GroundCheck, InputTooLongError
 
 # Request limits. The model truncates long sources anyway; these exist so one request
 # cannot pin the CPU or the process memory.
@@ -47,6 +47,11 @@ async def _lifespan(app: FastAPI):
 
 
 app = FastAPI(title="GroundCheck", version=__version__, lifespan=_lifespan)
+
+
+@app.exception_handler(InputTooLongError)
+async def _too_long(_: Request, exc: InputTooLongError) -> JSONResponse:
+    return JSONResponse(status_code=422, content={"detail": str(exc)})
 
 
 class CheckRequest(BaseModel):

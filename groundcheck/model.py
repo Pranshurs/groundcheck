@@ -50,6 +50,14 @@ class ModelUnavailableError(RuntimeError):
     """The model backend was requested (the default) but the model could not be loaded."""
 
 
+class InputTooLongError(ValueError):
+    """The answer alone does not fit in ``max_length`` tokens.
+
+    Only the source side is ever truncated; cutting the answer would mean judging a
+    different claim than the one asked about. Split long answers and check them separately.
+    """
+
+
 EXPECTED_LABELS = {0: "grounded", 1: "hallucinated"}
 
 
@@ -174,7 +182,21 @@ class GroundCheck:
     # ------------------------------------------------------------------ #
     # model backend                                                      #
     # ------------------------------------------------------------------ #
+    # Room the answer must leave for special tokens and at least a little source text.
+    _MIN_SOURCE_TOKENS = 16
+
+    def _check_answer_fits(self, answers: list[str]) -> None:
+        budget = self.settings.max_length - 3 - self._MIN_SOURCE_TOKENS
+        for i, ids in enumerate(self._tokenizer(answers, add_special_tokens=False)["input_ids"]):
+            if len(ids) > budget:
+                raise InputTooLongError(
+                    f"answer{'' if len(answers) == 1 else f' #{i}'} is {len(ids)} tokens; at "
+                    f"max_length={self.settings.max_length} it may be at most {budget}. "
+                    f"Split it into shorter claims."
+                )
+
     def _encode(self, source: str, answer: str, question: Optional[str]):
+        self._check_answer_fits([answer])
         premise = source if not question else f"{question}\n\n{source}"
         return self._tokenizer(
             premise,
@@ -202,6 +224,7 @@ class GroundCheck:
                 for it in chunk
             ]
             answers = [it["answer"] for it in chunk]
+            self._check_answer_fits(answers)
             t0 = time.perf_counter()
             enc = self._tokenizer(
                 premises,

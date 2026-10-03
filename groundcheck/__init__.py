@@ -17,10 +17,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from .model import GroundCheck, ModelUnavailableError
+from .model import GroundCheck, InputTooLongError, ModelUnavailableError
 from .schemas import CheckResult
 
-__all__ = ["GroundCheck", "CheckResult", "ModelUnavailableError", "check", "__version__"]
+__all__ = ["GroundCheck", "CheckResult", "InputTooLongError", "ModelUnavailableError", "check", "__version__"]
 __version__ = "0.2.0"
 
 _DEFAULT: Optional[GroundCheck] = None
