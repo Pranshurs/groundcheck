@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 (unreleased)
+## 0.2.0 (2026-10-04)
 
 Behaviour changes: read these before upgrading from 0.1.0.
 
