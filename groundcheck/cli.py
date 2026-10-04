@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 from .config import BACKENDS
-from .model import GroundCheck, ModelUnavailableError
+from .model import GroundCheck, InputTooLongError, ModelUnavailableError
 
 
 def _read(inline: str | None, path: str | None, what: str) -> str:
@@ -49,7 +49,11 @@ def main(argv: list[str] | None = None) -> int:
     except (ModelUnavailableError, ValueError) as exc:
         print(f"groundcheck: {exc}", file=sys.stderr)
         return 2
-    result = detector.check(source, answer, args.question)
+    try:
+        result = detector.check(source, answer, args.question)
+    except InputTooLongError as exc:
+        print(f"groundcheck: {exc}", file=sys.stderr)
+        return 2
 
     if args.json:
         print(json.dumps({**result.to_dict(), "model": detector.model_info()}, indent=2))

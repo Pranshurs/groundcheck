@@ -116,3 +116,14 @@ def test_offline_without_cached_weights_raises(tmp_path):
     )
     assert proc.returncode == 2, proc.stderr
     assert "Could not load model" in proc.stderr
+
+
+def test_cli_reports_an_overlong_answer_instead_of_crashing(monkeypatch, capsys):
+    from groundcheck import InputTooLongError
+
+    def too_long(self, source, answer, question=None):
+        raise InputTooLongError("answer uses 3000 tokens; the budget is 2048")
+
+    monkeypatch.setattr(GroundCheck, "check", too_long)
+    assert cli.main(["--backend", "heuristic", "--source", "s", "--answer", "a"]) == 2
+    assert "budget" in capsys.readouterr().err
