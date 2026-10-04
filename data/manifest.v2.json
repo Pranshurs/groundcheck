@@ -1,0 +1,90 @@
+{
+  "config": "groundcheck-v2",
+  "data_config": {
+    "hard_neg_test": 500,
+    "hard_neg_train": 2500,
+    "question_drop": 0.5,
+    "ragtruth_test": 2500,
+    "ragtruth_train": 10000,
+    "ragtruth_val": 1000,
+    "seed": 0,
+    "vitaminc_test": 2000,
+    "vitaminc_train": {
+      "NOT ENOUGH INFO": 2000,
+      "REFUTES": 4000,
+      "SUPPORTS": 10000
+    },
+    "vitaminc_val": 1000
+  },
+  "datasets": {
+    "ragtruth": {
+      "repo_id": "wandb/RAGTruth-processed",
+      "revision": "eb4f4b9d1b68eb7092d3e1a61c0cd82d9808737b"
+    },
+    "vitaminc": {
+      "repo_id": "tals/vitaminc",
+      "revision": "be6febb761b0b2807687e61e0b5282e459df2fa0"
+    }
+  },
+  "files": {
+    "flipped_test_hallucinated.jsonl": {
+      "flip_types": {
+        "date": 29,
+        "direction": 52,
+        "entity": 152,
+        "number": 267
+      },
+      "grounded": 0,
+      "hallucinated": 500,
+      "n": 500,
+      "sha256": "e477fa4387902e92a498acfa097029279b78a241c5888b801ecc37577aa4b817"
+    },
+    "flipped_test_original.jsonl": {
+      "grounded": 500,
+      "hallucinated": 0,
+      "n": 500,
+      "sha256": "5e713a8ab208c226d2cb97eb8cc97a881b4aaa81ef43a608da6e711db6aba5df"
+    },
+    "ragtruth_test.jsonl": {
+      "grounded": 1588,
+      "hallucinated": 912,
+      "n": 2500,
+      "sha256": "06ce754ebb3ab61b29005c0dc6476da5fd396419b3591a64cd01c069b8747398"
+    },
+    "train.jsonl": {
+      "flip_types": {
+        "date": 92,
+        "direction": 168,
+        "entity": 502,
+        "number": 1738
+      },
+      "grounded": 15540,
+      "hallucinated": 12960,
+      "n": 28500,
+      "sha256": "7ab00f84c243b09a084eea89fed7daef6665c90c76efbb6de25424634a89f3d4"
+    },
+    "val.jsonl": {
+      "grounded": 889,
+      "hallucinated": 1111,
+      "n": 2000,
+      "sha256": "244cffe01f8f92b290faba6053b40eaf0b59fa7436da177ca8db0226aa2722b3"
+    },
+    "vitaminc_test.jsonl": {
+      "grounded": 988,
+      "hallucinated": 1012,
+      "n": 2000,
+      "sha256": "10a78172bcdd0e9340c5df476c208e3064154aaf70c1157d968a68e737ee86e7"
+    }
+  },
+  "source_rows": {
+    "ragtruth": {
+      "test": 2700,
+      "train": 15090
+    },
+    "vitaminc": {
+      "test": 55197,
+      "train": 370653,
+      "validation": 63054
+    }
+  }
+}

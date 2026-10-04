@@ -1,9 +1,18 @@
-# A 150M model that beats GPT-4-as-judge at catching RAG hallucinations — trained for $0
+# A 150M model for catching RAG hallucinations — trained for $0
+
+> **Update, October 2026.** A reproducibility pass corrected four things in this post:
+> 1. The GPT-4 comparison: 0.634 is a published figure from a different protocol, not a head-to-head run.
+> 2. The CPU latency claim: it's now measured.
+> 3. The hard-negative counts.
+> 4. The statement that the benchmark script reproduced every number: it didn't then; `eval/reproduce.py` does now, with one stated exception.
+>
+> The corrected sentences are below; measured evidence is in the README.
 
 I built GroundCheck, a small open model that checks whether an AI answer is actually
-supported by the source it cites. It scores 0.682 F1 on the RAGTruth benchmark, ahead of
-the published GPT-4-turbo-as-judge baseline (0.634), and it returns a verdict in under a
-second on a laptop CPU. Total compute cost: zero — every training run fit inside Kaggle's
+supported by the source it cites. It scores 0.682 F1 on the RAGTruth benchmark (first 2,500 of the 2,700 test responses), where the RAGTruth paper reports 0.634 for a
+GPT-4-turbo prompt judge. That's a different protocol, not a head-to-head run. On a
+laptop CPU (Apple M1) it returns a verdict in about 40 ms for short claims and about 350 ms
+for a typical RAG document; documents over 2,048 tokens take about 1.5 s. Total compute cost: zero — every training run fit inside Kaggle's
 free GPU quota.
 
 Weights, benchmark code, and a pip package are public. This post is the honest version of
@@ -23,7 +32,8 @@ Hypothesis: the answer. Output: grounded or hallucinated, with a probability.
 ## v1: good benchmark, bad model
 
 The first version was ModernBERT-base fine-tuned on RAGTruth, the standard benchmark for
-this task: 0.688 F1, clear of the GPT-4 judge. Shipped it, felt great.
+this task: 0.688 F1, numerically above the published GPT-4 judge figure (a different protocol,
+not a head-to-head run). Shipped it, felt great.
 
 Then I ran five quick manual cases — short, realistic inputs like a source saying revenue
 "increased 12%" and an answer claiming it "fell 12%", or a vaccine's "94% effective"
@@ -44,8 +54,8 @@ The fix was three changes to the training mix, none to the architecture:
 2. **Programmatic hard negatives**: take a grounded answer, flip exactly one fact — a
    number, a date, a direction word, a named entity — and label it hallucinated. The
    original stays in the training set, so the model must compare rather than
-   pattern-match. ~2,700 of these flips are number edits, which is precisely where v1
-   was blind.
+   pattern-match. Most of the flips are number edits (1,738 of 2,500 in the rebuilt,
+   deterministic set), which is precisely where v1 was blind.
 3. **Question dropout**: half the training rows lose their question, so no-question
    inference matches training.
 
@@ -68,14 +78,16 @@ Honest limitations, so you can decide if it's useful before installing:
 - It trades some precision for recall on long fact-dense documents — it flags more
   borderline answers than v1 did. If false alarms cost you more than misses, raise the
   threshold.
-- English only, 512-token source window (chunk longer documents).
-- The training data carries research-oriented licenses, so the open model is for research
-  and non-commercial use.
+- English only. Trained at 512 tokens; the package reads up to 2,048 by default, and the
+  source is truncated beyond that (chunk longer documents).
+- Some of the training data (RAGTruth's MS MARCO and Yelp passages) carries non-commercial
+  terms. The weights are MIT, but read the data terms in the README before any commercial
+  use.
 
 ## Try it
 
 ```bash
-pip install groundcheck-rag
+pip install "groundcheck-rag[model]"
 ```
 
 ```python
@@ -90,8 +102,12 @@ gc.check(
 - Code and benchmark harness: https://github.com/Pranshurs/groundcheck
 - Weights: https://huggingface.co/Pranshurs/groundcheck-modernbert
 
-The benchmark script reproduces every number above, confidence intervals included.
+`python -m eval.reproduce` re-derives the RAGTruth and VitaminC numbers from the pinned
+weights and the rebuilt public test sets, to within one prediction in 2,500. The flipped-pair
+holdout had to be regenerated (78.0% caught / 76.0% kept, against 80.4% / 76.2% originally),
+because the original sample depended on Python's hash seed.
 
-I'm also piloting a hosted version trained from scratch on commercially-clean data
-(sentence-level verdicts, batch log auditing, commercial use allowed). If that's relevant
-to your team, email me — address is in the repo.
+I'm also building a separate commercial version, in a private repository. It's trained
+from scratch on data cleared for commercial use, with sentence-level verdicts and batch log
+auditing. There's no hosted endpoint yet. If that's relevant to your team, email me; the
+address is in the repo.

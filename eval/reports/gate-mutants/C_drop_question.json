@@ -1,0 +1,84 @@
+{
+  "created_utc": "2026-10-03T16:46:12+00:00",
+  "code": {
+    "commit": "6c2c3258c235f567306b62385db4459af67062a4",
+    "dirty": true
+  },
+  "model": {
+    "backend": "model",
+    "path": "Pranshurs/groundcheck-modernbert",
+    "requested_revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+    "resolved_revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+    "architecture": "ModernBertForSequenceClassification",
+    "max_length": 512,
+    "device": "cpu",
+    "weights_sha256": "9ec331ba6d8a9d93236dd72b239df518b07e61241323876f8aafc223d959461a"
+  },
+  "data": {
+    "manifest_sha256": "678cf1565b5e85bda72bbe41df6dd7886b1ca2aeb0b144632cfd7b18e54fe554",
+    "files": {
+      "ragtruth_test.jsonl": "06ce754ebb3ab61b29005c0dc6476da5fd396419b3591a64cd01c069b8747398",
+      "vitaminc_test.jsonl": "10a78172bcdd0e9340c5df476c208e3064154aaf70c1157d968a68e737ee86e7",
+      "flipped_test_hallucinated.jsonl": "e477fa4387902e92a498acfa097029279b78a241c5888b801ecc37577aa4b817",
+      "flipped_test_original.jsonl": "5e713a8ab208c226d2cb97eb8cc97a881b4aaa81ef43a608da6e711db6aba5df"
+    }
+  },
+  "protocol": {
+    "threshold": 0.5,
+    "max_length": 512,
+    "positive_class": "hallucinated",
+    "bootstrap": "2000 resamples, seed 0, percentile 95%",
+    "subset": "eval/baselines/gate_subset.json"
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cpu": "Apple M1",
+    "torch": "2.4.1",
+    "transformers": "4.49.0",
+    "torch_threads": 4
+  },
+  "timing": {
+    "model_load_seconds": 3.94,
+    "ragtruth_seconds": 87.2,
+    "vitaminc_seconds": 7.4
+  },
+  "suites": {
+    "ragtruth": {
+      "n": 200,
+      "accuracy": 0.755,
+      "precision": 0.6667,
+      "recall_hallucinated": 0.6575,
+      "recall_grounded": 0.811,
+      "f1": 0.6621,
+      "confusion": {
+        "tp": 48,
+        "fp": 24,
+        "fn": 25,
+        "tn": 103
+      },
+      "f1_ci95": [
+        0.5667,
+        0.7451
+      ]
+    },
+    "vitaminc": {
+      "n": 100,
+      "accuracy": 0.88,
+      "precision": 0.8679,
+      "recall_hallucinated": 0.902,
+      "recall_grounded": 0.8571,
+      "f1": 0.8846,
+      "confusion": {
+        "tp": 46,
+        "fp": 7,
+        "fn": 5,
+        "tn": 42
+      },
+      "f1_ci95": [
+        0.8119,
+        0.9423
+      ]
+    }
+  }
+}

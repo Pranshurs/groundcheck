@@ -1,0 +1,60 @@
+name: model
+
+# Model tier: the pinned published weights on CPU. Verifies provenance and data
+# checksums, runs the real-model tests, then the regression gate on a fixed
+# 300-row slice. Runs on changes that can affect predictions, weekly, and on demand.
+on:
+  pull_request:
+    paths:
+      - "groundcheck/**"
+      - "eval/**"
+      - "training/data.py"
+      - "training/build_data.py"
+      - "training/configs/**"
+      - "data/manifest.v2.json"
+      - "MODEL_PROVENANCE.json"
+      - "requirements-train.txt"
+      - ".github/workflows/model.yml"
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install (CPU torch, pinned)
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements-train.txt
+          pip install -r requirements-dev.txt
+          pip install -e ".[serve]"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ hashFiles('MODEL_PROVENANCE.json', 'training/configs/v2.json') }}
+      - name: Weights match the recorded provenance
+        run: python -m eval.provenance --verify
+      - name: Rebuild public data and check it against the manifest
+        run: python -m training.build_data --verify
+      - name: Real-model tests
+        run: pytest -q -m model
+      - name: Score the gate slice
+        run: python -m eval.reproduce --suites ragtruth vitaminc --subset eval/baselines/gate_subset.json --out gate/result.json
+      - name: Regression gate
+        run: python -m eval.gate gate/result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate-result
+          path: gate/

@@ -1,0 +1,107 @@
+{
+  "created_utc": "2026-10-03T17:17:14+00:00",
+  "hardware": {
+    "machine": "arm64",
+    "logical_cpus": 8,
+    "model": "Apple M1",
+    "memory_gb": 16
+  },
+  "software": {
+    "python": "3.12.13",
+    "os": "macOS-26.6.2-arm64-arm-64bit",
+    "torch": "2.4.1",
+    "transformers": "4.49.0",
+    "torch_threads": 4
+  },
+  "model": {
+    "backend": "model",
+    "path": "Pranshurs/groundcheck-modernbert",
+    "requested_revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+    "resolved_revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+    "architecture": "ModernBertForSequenceClassification",
+    "max_length": 2048,
+    "device": "cpu"
+  },
+  "system_load_avg_1_5_15m_at_start": [
+    2.42,
+    4.51,
+    5.88
+  ],
+  "load": {
+    "import_seconds": 0.7,
+    "model_load_seconds": 1.14,
+    "note": "load time includes reading weights from the local HF cache; not a download"
+  },
+  "single_request_ms": {
+    "short": {
+      "tokens_range": [
+        0,
+        128
+      ],
+      "n": 60,
+      "model_tokens_median": 44.5,
+      "p50": 38.8,
+      "p95": 51.5,
+      "mean": 41.4,
+      "max": 61.7
+    },
+    "medium": {
+      "tokens_range": [
+        129,
+        512
+      ],
+      "n": 60,
+      "model_tokens_median": 424.5,
+      "p50": 172.4,
+      "p95": 207.8,
+      "mean": 164.3,
+      "max": 214.7
+    },
+    "long": {
+      "tokens_range": [
+        513,
+        2048
+      ],
+      "n": 60,
+      "model_tokens_median": 788.5,
+      "p50": 348.6,
+      "p95": 825.2,
+      "mean": 418.9,
+      "max": 1098.6
+    },
+    "xlong": {
+      "tokens_range": [
+        2049,
+        null
+      ],
+      "n": 14,
+      "model_tokens_median": 2048.0,
+      "p50": 1450.6,
+      "p95": 1460.4,
+      "mean": 1454.8,
+      "max": 1497.5
+    }
+  },
+  "batch_throughput": {
+    "short": {
+      "batch_size": 8,
+      "rows": 60,
+      "rows_per_second": 34.47
+    },
+    "medium": {
+      "batch_size": 8,
+      "rows": 60,
+      "rows_per_second": 5.38
+    },
+    "long": {
+      "batch_size": 8,
+      "rows": 60,
+      "rows_per_second": 1.29
+    },
+    "xlong": {
+      "batch_size": 8,
+      "rows": 14,
+      "rows_per_second": 0.7
+    }
+  }
+}

@@ -8,4 +8,4 @@ The actual logic lives in ``groundcheck/cli.py`` (also installed as the ``ground
 from groundcheck.cli import main
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -1,0 +1,3 @@
+    encodings = self._tokenizer.encode_batch(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Exception: Truncation error: Sequence to truncate too short to respect the provided max_length

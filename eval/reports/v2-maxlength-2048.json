@@ -1,0 +1,114 @@
+{
+  "created_utc": "2026-10-03T16:36:11+00:00",
+  "code": {
+    "commit": "6c2c3258c235f567306b62385db4459af67062a4",
+    "dirty": false
+  },
+  "model": {
+    "backend": "model",
+    "path": "Pranshurs/groundcheck-modernbert",
+    "requested_revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+    "resolved_revision": "998cec35563d6b90947409d1c7510adac7f7c80c",
+    "architecture": "ModernBertForSequenceClassification",
+    "max_length": 2048,
+    "device": "cpu",
+    "weights_sha256": "9ec331ba6d8a9d93236dd72b239df518b07e61241323876f8aafc223d959461a"
+  },
+  "data": {
+    "manifest_sha256": "678cf1565b5e85bda72bbe41df6dd7886b1ca2aeb0b144632cfd7b18e54fe554",
+    "files": {
+      "ragtruth_test.jsonl": "06ce754ebb3ab61b29005c0dc6476da5fd396419b3591a64cd01c069b8747398",
+      "vitaminc_test.jsonl": "10a78172bcdd0e9340c5df476c208e3064154aaf70c1157d968a68e737ee86e7",
+      "flipped_test_hallucinated.jsonl": "e477fa4387902e92a498acfa097029279b78a241c5888b801ecc37577aa4b817",
+      "flipped_test_original.jsonl": "5e713a8ab208c226d2cb97eb8cc97a881b4aaa81ef43a608da6e711db6aba5df"
+    }
+  },
+  "protocol": {
+    "threshold": 0.5,
+    "max_length": 2048,
+    "positive_class": "hallucinated",
+    "bootstrap": "2000 resamples, seed 0, percentile 95%",
+    "subset": null
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "cpu": "Apple M1",
+    "torch": "2.4.1",
+    "transformers": "4.49.0",
+    "torch_threads": 4
+  },
+  "timing": {
+    "model_load_seconds": 2.52,
+    "ragtruth_seconds": 1553.3,
+    "vitaminc_seconds": 60.6,
+    "flipped_hallucinated_seconds": 365.3,
+    "flipped_original_seconds": 364.2
+  },
+  "suites": {
+    "ragtruth": {
+      "n": 2500,
+      "accuracy": 0.7576,
+      "precision": 0.6419,
+      "recall_hallucinated": 0.7588,
+      "recall_grounded": 0.7569,
+      "f1": 0.6955,
+      "confusion": {
+        "tp": 692,
+        "fp": 386,
+        "fn": 220,
+        "tn": 1202
+      },
+      "f1_ci95": [
+        0.6717,
+        0.7179
+      ]
+    },
+    "vitaminc": {
+      "n": 2000,
+      "accuracy": 0.85,
+      "precision": 0.8844,
+      "recall_hallucinated": 0.8093,
+      "recall_grounded": 0.8917,
+      "f1": 0.8452,
+      "confusion": {
+        "tp": 819,
+        "fp": 107,
+        "fn": 193,
+        "tn": 881
+      },
+      "f1_ci95": [
+        0.8278,
+        0.8617
+      ]
+    },
+    "flipped_hallucinated": {
+      "n": 500,
+      "accuracy": 0.872,
+      "precision": 1.0,
+      "recall_hallucinated": 0.872,
+      "recall_grounded": null,
+      "f1": 0.9316,
+      "confusion": {
+        "tp": 436,
+        "fp": 0,
+        "fn": 64,
+        "tn": 0
+      }
+    },
+    "flipped_original": {
+      "n": 500,
+      "accuracy": 0.74,
+      "precision": 0.0,
+      "recall_hallucinated": 0.0,
+      "recall_grounded": 0.74,
+      "f1": 0.0,
+      "confusion": {
+        "tp": 0,
+        "fp": 130,
+        "fn": 0,
+        "tn": 370
+      }
+    }
+  }
+}

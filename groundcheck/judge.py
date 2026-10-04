@@ -109,7 +109,10 @@ class MockJudge(BaseJudge):
         # Squash toward a decision so the mock behaves a little more like a confident judge.
         score = round(min(1.0, max(0.0, (frac - 0.4) / 0.4)), 4)
         latency_ms = (time.perf_counter() - t0) * 1000.0
-        approx = lambda s: max(1, len(s) // 4)  # ~4 chars/token
+
+        def approx(s: str) -> int:  # ~4 chars/token
+            return max(1, len(s) // 4)
+
         return JudgeResult(
             grounded=score >= 0.5,
             grounded_score=score,
