@@ -3,7 +3,7 @@
 [![tests](https://github.com/Pranshurs/groundcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Pranshurs/groundcheck/actions/workflows/ci.yml)
 [![model](https://github.com/Pranshurs/groundcheck/actions/workflows/model.yml/badge.svg)](https://github.com/Pranshurs/groundcheck/actions/workflows/model.yml)
 [![PyPI](https://img.shields.io/pypi/v/groundcheck-rag)](https://pypi.org/project/groundcheck-rag/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Code license: Apache-2.0](https://img.shields.io/badge/code%20license-Apache--2.0-blue.svg)](LICENSE)
 
 Checks whether a RAG answer is supported by the source it was given, using a fine-tuned
 150M-parameter ModernBERT classifier that runs on CPU.
@@ -193,8 +193,8 @@ tests/          unit tier (no weights) and model tier (pytest -m model)
   source, not truth.
 - **Benchmark coverage.** RAGTruth, VitaminC and rule-generated single-fact flips. No
   adversarial or out-of-domain evaluation has been run.
-- **Licensing.** The training data (RAGTruth, VitaminC) carries research-oriented terms from
-  its underlying sources. Research and non-commercial use.
+- **Data terms.** Part of the training data comes from sources with non-commercial terms
+  (see [License](#license)). Review them before any commercial use of the model.
 
 ## Development
 
@@ -205,11 +205,33 @@ pytest -m model        # model tier: needs requirements-train.txt, downloads the
 ruff check --select E,F,W,B --ignore E501 groundcheck eval training bench tests run.py
 ```
 
-## Hosted version
+## Commercial version
 
-A commercially licensed version (sentence-level verdicts, batch log auditing, hosted API)
-is in pilot. Details are in docs/how-it-was-built.md, or email pranshu.rs08@gmail.com.
+A separate commercial version (sentence-level verdicts, batch log auditing), trained on
+data cleared for commercial use, is in development in a private repository. It isn't part
+of this project, and no hosted endpoint is available. Contact: pranshu.rs08@gmail.com.
 
 ## License
 
-MIT. Base model: answerdotai/ModernBERT-base (Apache-2.0).
+Each layer has its own terms:
+
+| What | Terms |
+|---|---|
+| Code in this repository | [Apache-2.0](LICENSE) from 0.2.0. Releases up to 0.1.0 were MIT. |
+| Model weights ([`Pranshurs/groundcheck-modernbert`](https://huggingface.co/Pranshurs/groundcheck-modernbert)) | MIT, as published on the Hugging Face Hub |
+| Base model (`answerdotai/ModernBERT-base`) | Apache-2.0 |
+| Training and evaluation data | The upstream terms of each source, listed in [`DATA_LICENSES.md`](DATA_LICENSES.md). They are **not** covered by this repository's license. |
+
+**Data restrictions.** RAGTruth itself is MIT, but its source passages come from:
+- **MS MARCO:** Microsoft's terms allow non-commercial research use only.
+- **The Yelp Open Dataset:** Yelp's terms allow academic and non-commercial use only.
+- **CNN/DailyMail:** the articles are copyrighted by their publishers.
+
+VitaminC is CC BY-SA 3.0.
+
+This repository doesn't redistribute any of that data. `training/build_data.py` downloads
+it from the Hub, and the files it writes keep their upstream terms.
+
+The MIT license on the weights covers the trained model itself. Whether a source dataset's
+non-commercial terms extend to a model trained on it is legally unsettled. If you plan
+commercial use, review the terms above for your situation. This isn't legal advice.

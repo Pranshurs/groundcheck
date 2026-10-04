@@ -1,0 +1,7 @@
+GroundCheck
+Copyright 2026 Pranshu Raj
+
+This product includes code licensed under the Apache License, Version 2.0 (see LICENSE).
+The published model weights (Pranshurs/groundcheck-modernbert) are licensed separately
+under MIT. Training and evaluation data retain their upstream terms (see DATA_LICENSES.md)
+and are not covered by this license.

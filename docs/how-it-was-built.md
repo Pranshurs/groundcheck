@@ -80,8 +80,9 @@ Honest limitations, so you can decide if it's useful before installing:
   threshold.
 - English only. Trained at 512 tokens; the package reads up to 2,048 by default, and the
   source is truncated beyond that (chunk longer documents).
-- The training data carries research-oriented licenses, so the open model is for research
-  and non-commercial use.
+- Some of the training data (RAGTruth's MS MARCO and Yelp passages) carries non-commercial
+  terms. The weights are MIT, but read the data terms in the README before any commercial
+  use.
 
 ## Try it
 
@@ -106,6 +107,7 @@ weights and the rebuilt public test sets, to within one prediction in 2,500. The
 holdout had to be regenerated (78.0% caught / 76.0% kept, against 80.4% / 76.2% originally),
 because the original sample depended on Python's hash seed.
 
-I'm also piloting a hosted version trained from scratch on commercially-clean data
-(sentence-level verdicts, batch log auditing, commercial use allowed). If that's relevant
-to your team, email me — address is in the repo.
+I'm also building a separate commercial version, in a private repository. It's trained
+from scratch on data cleared for commercial use, with sentence-level verdicts and batch log
+auditing. There's no hosted endpoint yet. If that's relevant to your team, email me; the
+address is in the repo.

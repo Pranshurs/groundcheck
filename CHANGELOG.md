@@ -40,6 +40,10 @@ Reproducibility and evidence (repository only, not in the wheel):
 - Corrected documentation: the GPT-4 figure is an external reference from a different
   protocol, and latency is measured rather than claimed.
 
+Licensing: the code is now Apache-2.0 (0.1.0 was MIT). The model weights stay MIT on the
+Hub. Training and evaluation data keep their upstream terms; see `DATA_LICENSES.md`,
+including the non-commercial terms on RAGTruth's MS MARCO and Yelp passages.
+
 Verified stacks: torch 2.4.1 + transformers 4.49.0 (pinned; CI), and torch 2.14.1 +
 transformers 5.18.0 (unpinned install, identical gate-slice predictions).
 

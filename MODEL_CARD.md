@@ -69,5 +69,6 @@ fact-checker against world knowledge.
 - Precision on RAGTruth is about 0.63, and about a quarter of grounded answers in the
   minimal-edit holdout are flagged. Tune the threshold on your own data.
 - Not evaluated on adversarial or out-of-domain inputs.
-- The training data carries research-oriented terms from its sources (see the README's
-  licensing note).
+- Training data terms: RAGTruth's source passages include MS MARCO and Yelp, whose terms
+  are non-commercial. The weights are MIT. See the README's License section and
+  `DATA_LICENSES.md` before any commercial use.
